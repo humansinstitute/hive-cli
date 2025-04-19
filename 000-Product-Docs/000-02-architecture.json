@@ -1,6 +1,6 @@
 {
-    "architecture": {
-        "front_end": "cli menu",
-        "backend": "Can call to APIs on everest chat using a set of predefined agents in the ./agents folder.\n"
-    }
+  "architecture": {
+    "front_end": "simple Nodejs cli app with future plans for a server and chat client component running on localhost",
+    "backend": "nodejs CLI app utilizing local filesystem in the project repo for data storage; API agents on everest backend"
+  }
 }

@@ -1,5 +1,7 @@
 const readline = require('readline');
 const { artefactBuilder } = require('./artefactBuilder'); // Import the builder
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Handles the definition or update process for product-level documentation
@@ -39,6 +41,18 @@ async function defineProduct(scope) {
                     console.log("--- Product Level Definition Complete ---");
                     resolve(); // Resolve the promise to signal completion
                 } else {
+                    if (userInput === '/update') {
+                        const artefactsObj = lastArtefacts[0];
+                        const fileMap = lastArtefactInitial.filePaths;
+                        for (const key of Object.keys(artefactsObj)) {
+                            const filePath = fileMap[key];
+                            if (filePath) {
+                                fs.writeFileSync(filePath, JSON.stringify({ [key]: artefactsObj[key] }, null, 2) + '\n');
+                            }
+                        }
+                        console.log('Artefact files updated.');
+                        return askQuestion();
+                    }
                     // Construct the conversation object for the builder
                     const conversation = {
                         message: userInput,
@@ -54,7 +68,7 @@ async function defineProduct(scope) {
 
                         // Log the response object for debugging (optional)
                         // console.log('Artefact Builder Response:', builderResponse);
-                        // Log the 
+                        // Log the current product artefact in total for easy reading on screen. 
                         console.log(builderResponse.artefacts[0].pbrief);
                         console.log(builderResponse.artefacts[0].architecture);
                         console.log(builderResponse.artefacts[0].features);
@@ -63,7 +77,10 @@ async function defineProduct(scope) {
                         history = builderResponse.history; // Update history from the response
                         lastArtefacts = builderResponse.artefacts; // Update artefacts from the response
                         lastArtefactFrame = builderResponse.artefactFrame; // Store the new frame
-                        lastArtefactInitial = builderResponse.artefactInitial; // Store the new initial state
+                        lastArtefactInitial = {
+                            data: builderResponse.artefactInitial,
+                            filePaths: builderResponse.artefactPaths
+                        }; // Store the new initial state including file paths
                         question = builderResponse.message; // Update the question for the next prompt
 
                         // Ask the next question

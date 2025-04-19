@@ -1,20 +1,97 @@
 {
-    "features": {
-        "features_list": [
-            {
-                "feature_ref": "001",
-                "feature_name": "",
-                "feature_status": "backlog | wip | delivered | archived",
-                "feature_focus": "",
-                "feature_brief": ""
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "title": "Features Schema",
+    "description": "A schema for defining product features with status tracking",
+    "required": [
+        "features"
+    ],
+    "properties": {
+        "features": {
+            "type": "object",
+            "required": [
+                "features_list"
+            ],
+            "properties": {
+                "features_list": {
+                    "type": "array",
+                    "description": "List of product features with tracking information",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "feature_ref",
+                            "feature_name",
+                            "feature_status"
+                        ],
+                        "properties": {
+                            "feature_ref": {
+                                "type": "string",
+                                "description": "Unique reference identifier for the feature",
+                                "pattern": "^[0-9]{3,}$",
+                                "examples": [
+                                    "001",
+                                    "002",
+                                    "123"
+                                ]
+                            },
+                            "feature_name": {
+                                "type": "string",
+                                "description": "Short, descriptive name of the feature",
+                                "minLength": 1
+                            },
+                            "feature_status": {
+                                "type": "string",
+                                "description": "Current development status of the feature",
+                                "enum": [
+                                    "backlog",
+                                    "wip",
+                                    "delivered",
+                                    "archived"
+                                ]
+                            },
+                            "feature_brief": {
+                                "type": "string",
+                                "description": "A concise paragraph describing what the feature is trying to achieve and its value"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "minItems": 1
+                }
             },
-            {
-                "feature_ref": "002",
-                "feature_name": "",
-                "feature_status": "backlog | wip | delivered | archived",
-                "feature_focus": "",
-                "feature_brief": ""
+            "additionalProperties": false
+        }
+    },
+    "examples": [
+        {
+            "features": {
+                "features_list": [
+                    {
+                        "feature_ref": "001",
+                        "feature_name": "cli menu for chat agents",
+                        "feature_status": "wip",
+                        "feature_brief": "Clean menu that can be used to trigger chats in the CLI that build specific menus."
+                    },
+                    {
+                        "feature_ref": "002",
+                        "feature_name": "build retrieval context",
+                        "feature_status": "backlog",
+                        "feature_brief": "A system to build and maintain context from project files for more accurate agent responses via MCP."
+                    },
+                    {
+                        "feature_ref": "003",
+                        "feature_name": "call retrieval agents",
+                        "feature_status": "backlog",
+                        "feature_brief": "Enable the CLI to invoke specialized agents that can retrieve and process external information via MCP."
+                    },
+                    {
+                        "feature_ref": "004",
+                        "feature_name": "LLM Agents develop requirements",
+                        "feature_status": "wip",
+                        "feature_brief": "This feature will allow a conversational flow between the user and hive cli to update a specific set of product level or feature level information. The focus will be on simple CLI based chat to update JSON files stored locally on the FS."
+                    }
+                ]
             }
-        ]
-    }
+        }
+    ]
 }

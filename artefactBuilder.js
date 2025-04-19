@@ -75,6 +75,28 @@ async function _readJsonArtefactsFromDir(dirPath) {
     return aggregatedArtefacts;
 }
 
+async function _getJsonArtefactPaths(dirPath) {
+    const filePaths = {};
+    try {
+        const entries = fs.readdirSync(dirPath);
+        for (const entryName of entries) {
+            const fullPath = path.join(dirPath, entryName);
+            const stats = fs.statSync(fullPath);
+            if (stats.isFile() && path.extname(entryName).toLowerCase() === '.json') {
+                const content = fs.readFileSync(fullPath, 'utf8');
+                const parsed = JSON.parse(content);
+                const keys = Object.keys(parsed);
+                if (keys.length > 0) {
+                    filePaths[keys[0]] = fullPath;
+                }
+            }
+        }
+    } catch (err) {
+        console.error(`Error retrieving JSON file paths from ${dirPath}:`, err);
+    }
+    return filePaths;
+}
+
 // --- Public Functions ---
 
 /**
@@ -103,10 +125,12 @@ async function getArtefactInitial(scope) {
     console.log("--- getArtefactInitial Called ---");
     if (scope?.scopelevel !== 'product') {
         console.log("Scope is not 'product', returning empty initial state.");
-        return {};
+        return { data: {}, filePaths: {} };
     }
-    // Read from the actual product docs directory
-    return await _readJsonArtefactsFromDir('./000-Product-Docs');
+    // Read content and file paths from the actual product docs directory
+    const data = await _readJsonArtefactsFromDir('./000-Product-Docs');
+    const filePaths = await _getJsonArtefactPaths('./000-Product-Docs');
+    return { data, filePaths };
 }
 
 
@@ -147,16 +171,17 @@ async function artefactBuilder(conversation, userid, scope) { // Updated param n
     // CALL THE function getArtefactFrame and capture the response as a variable artefactFrame
     // Send the scope object received.
     const artefactFrame = conversation.artefactFrame ?? await getArtefactFrame(scope);       // Get the template structure
-    const artefactInitial = conversation.artefactInitial ?? await getArtefactInitial(scope); // Get the initial data state
+    const { data: artefactInitialData, filePaths: artefactFilePaths } =
+        conversation.artefactInitial ?? await getArtefactInitial(scope); // Get the initial data and paths
 
     // Determine artefact data: use initial state if no previous artefact exists
     const artefactData = (conversation.artefacts && conversation.artefacts.length > 0)
         ? conversation.artefacts
-        : artefactInitial;
+        : artefactInitialData;
 
     let artefactsObject = {
         artefactFrame: artefactFrame,
-        artefactInitial: artefactInitial,
+        artefactInitial: artefactInitialData,
         artefact: artefactData
     };
 
@@ -186,7 +211,8 @@ async function artefactBuilder(conversation, userid, scope) { // Updated param n
             agentUpdates.artefactUpdated
         ],
         artefactFrame: artefactFrame,     // Include the template frame
-        artefactInitial: artefactInitial, // Include the initial state
+        artefactInitial: artefactInitialData, // Include the initial state
+        artefactPaths: artefactFilePaths,     // Include file path mapping
         input: {
             scope: scope, // Pass the received scope
             question: conversation.message, // The user's latest message

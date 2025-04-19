@@ -15,19 +15,25 @@ async function artefactAgent(message, context, history, artefactsObject) { //FIL
     // artefactsObject.artefactInitial -> The start point prior to the conversation
     // artefactsObject.artefact -> The latest version of the artefact.
 
-    const systemPromptInput = `Please review this conversation history and output a JSON object with the following fields:
+    const systemPromptInput = `You are an experienced Senior Product manager. Please review the message, conversation history and current artefact state. 
+    
+    You objective is to improve the artefact and ensure that we have a clear artefact that descirbes this product based on the following JSON schema:
 
-    JSON OBJECT
+    JSON SCHEMA
     ${JSON.stringify(artefactsObject.artefactFrame)}
 
     *******
-    The current facts you know right now are:
+    The current artefact details are:
+
     ${JSON.stringify(artefactsObject.artefact)}
+
     *******
 
-    Please review the conversation and update with additional facts. Do not remove interesting facts from earlier in the conversation but build upon them. Goals and other elements can be refined over time.
+    - Please review the conversation and update the artefact with additinal facts from the conversation.
+    - Do not remove interesting facts from earlier in the conversation but build upon them. 
 
     HERE IS THE MESSAGE HISTORY OF THIS CONVERSATION:
+    
     Last Message: ${message} 
     Message History: ${historyString}
         

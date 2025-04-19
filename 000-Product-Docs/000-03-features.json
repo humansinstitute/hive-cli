@@ -1,27 +1,34 @@
 {
-    "features": {
-        "features_list": [
-            {
-                "feature_ref": "001",
-                "feature_name": "cli menu for chat agents",
-                "feature_status": "wip",
-                "feature_focus": "Clean menu that can be used to trigger chats in the CLI that build specific menus.",
-                "feature_brief": "The menu will need to "
-            },
-            {
-                "feature_ref": "002",
-                "feature_name": "build retreival context",
-                "feature_status": "backlog",
-                "feature_focus": "",
-                "feature_brief": ""
-            },
-            {
-                "feature_ref": "003",
-                "feature_name": "call retreival agents",
-                "feature_status": "backlog | wip | delivered | archived",
-                "feature_focus": "",
-                "feature_brief": ""
-            }
-        ]
-    }
+  "features": {
+    "features_list": [
+      {
+        "feature_ref": "001",
+        "feature_name": "cli menu for chat agents",
+        "feature_status": "wip",
+        "feature_focus": "Clean menu that can be used to trigger chats in the CLI that build specific menus.",
+        "feature_brief": "The menu will need to "
+      },
+      {
+        "feature_ref": "002",
+        "feature_name": "build retreival context",
+        "feature_status": "backlog",
+        "feature_focus": "",
+        "feature_brief": ""
+      },
+      {
+        "feature_ref": "003",
+        "feature_name": "call retreival agents",
+        "feature_status": "backlog | wip | delivered | archived",
+        "feature_focus": "",
+        "feature_brief": ""
+      },
+      {
+        "feature_ref": "004",
+        "feature_name": "LLM Agents develop requirements",
+        "feature_status": "wip",
+        "feature_focus": "Conversational flow between the user and hive cli to update product or feature level information.",
+        "feature_brief": "This feature will allow a conversational flow between the user and hive cli to update a specific set of product level or feature level information. The focus will be on simple LCI based chat to update JSON files stored locally on the FS."
+      }
+    ]
+  }
 }

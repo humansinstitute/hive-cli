@@ -1,6 +1,47 @@
 {
-    "architecture": {
-        "front_end": "",
-        "backend": ""
-    }
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "title": "Architecture Schema",
+    "description": "A schema for defining the technical architecture of a product",
+    "required": [
+        "architecture"
+    ],
+    "properties": {
+        "architecture": {
+            "type": "object",
+            "required": [
+                "front_end",
+                "backend"
+            ],
+            "properties": {
+                "front_end": {
+                    "type": "string",
+                    "description": "Description of the user-facing components, interfaces, and client-side technologies used in the product",
+                    "examples": [
+                        "Simple Node.js CLI app with future plans for a server and chat client component running on localhost",
+                        "React web application with responsive design supporting desktop and mobile browsers",
+                        "React Native mobile app targeting iOS and Android platforms with offline capability"
+                    ]
+                },
+                "backend": {
+                    "type": "string",
+                    "description": "Description of the server-side components, data storage, APIs, and processing systems that power the product",
+                    "examples": [
+                        "Node.js CLI app utilizing local filesystem in the project repo for data storage; API agents on everest backend",
+                        "Python Flask microservices deployed on Kubernetes with MongoDB for storage and Redis for caching",
+                        "Serverless architecture using AWS Lambda with DynamoDB for persistence and S3 for file storage"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "examples": [
+        {
+            "architecture": {
+                "front_end": "Simple Node.js CLI app with future plans for a server and chat client component running on localhost",
+                "backend": "Node.js CLI app utilizing local filesystem in the project repo for data storage; API agents on everest backend"
+            }
+        }
+    ]
 }
