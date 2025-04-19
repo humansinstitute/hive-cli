@@ -32,8 +32,8 @@ async function defineProduct(scope) {
                 const userInput = answer.trim();
 
                 if (userInput.toLowerCase() === 'exit') {
-                    console.log("Exiting product definition.");
-                    console.log("Final Scope:", scope);
+                    // console.log("Exiting product definition.");
+                    // console.log("Final Scope:", scope);
                     await new Promise(res => setTimeout(res, 2000)); // Wait 2 seconds
                     rl.close();
                     console.log("--- Product Level Definition Complete ---");
@@ -53,7 +53,11 @@ async function defineProduct(scope) {
                         const builderResponse = await artefactBuilder(conversation, 'pw21', scope);
 
                         // Log the response object for debugging (optional)
-                        console.log('Artefact Builder Response:', builderResponse);
+                        // console.log('Artefact Builder Response:', builderResponse);
+                        // Log the 
+                        console.log(builderResponse.artefacts[0].pbrief);
+                        console.log(builderResponse.artefacts[0].architecture);
+                        console.log(builderResponse.artefacts[0].features);
 
                         // Update state for the next turn
                         history = builderResponse.history; // Update history from the response

@@ -29,12 +29,12 @@ const aiWrapper = require('./common/aimodels/aiWrapper'); // Used to Call differ
  * @returns {Promise<object>} An object containing the aggregated content, keyed by the top-level key from each file.
  */
 async function _readJsonArtefactsFromDir(dirPath) {
-    console.log(`--- _readJsonArtefactsFromDir Called for: ${dirPath} ---`);
+    // console.log(`--- _readJsonArtefactsFromDir Called for: ${dirPath} ---`);
     const aggregatedArtefacts = {};
 
     try {
         const entries = fs.readdirSync(dirPath);
-        console.log(`Directory entries for ${dirPath}:`, entries);
+        // console.log(`Directory entries for ${dirPath}:`, entries);
 
         for (const entryName of entries) {
             const fullPath = path.join(dirPath, entryName);
@@ -50,17 +50,17 @@ async function _readJsonArtefactsFromDir(dirPath) {
                         if (keys.length > 0) {
                             const key = keys[0];
                             aggregatedArtefacts[key] = parsedJson[key];
-                            console.log(`Read content from ${entryName} under key '${key}' into aggregated object.`);
+                            // console.log(`Read content from ${entryName} under key '${key}' into aggregated object.`);
                         } else {
-                            console.warn(`Skipping ${entryName}: JSON file is empty or has no keys.`);
+                            // console.warn(`Skipping ${entryName}: JSON file is empty or has no keys.`);
                         }
                     } catch (parseError) {
                         console.error(`Error reading or parsing JSON file ${entryName}:`, parseError);
                     }
                 } else if (stats.isDirectory()) {
-                    console.log(`Skipping directory: ${entryName}`);
+                    // console.log(`Skipping directory: ${entryName}`);
                 } else {
-                    console.log(`Skipping non-JSON file: ${entryName}`);
+                    // console.log(`Skipping non-JSON file: ${entryName}`);
                 }
             } catch (statError) {
                 console.error(`Error getting stats for ${fullPath}:`, statError);
@@ -71,7 +71,7 @@ async function _readJsonArtefactsFromDir(dirPath) {
         return {}; // Return empty object on directory read error
     }
 
-    console.log(`Generated aggregated artefacts for ${dirPath}:`, aggregatedArtefacts);
+    // console.log(`Generated aggregated artefacts for ${dirPath}:`, aggregatedArtefacts);
     return aggregatedArtefacts;
 }
 
@@ -117,14 +117,14 @@ async function getArtefactInitial(scope) {
 async function agentLogic(conversation, artefactsObject) {
     console.log("--- Starting Agent Logic Flow ---")
 
-    console.log("--- Calling Artefact Agent ---")
+    // console.log("--- Calling Artefact Agent ---")
     const callArtefactAgent = await artefactAgent(conversation.message, "", conversation.history, artefactsObject);
     const updatedArtefactsObject = await aiWrapper(callArtefactAgent);
 
     // Updates the artefactsObject based on the response from artefact agent. 
     artefactsObject.artefact = updatedArtefactsObject.message;
 
-    console.log("--- Calling Converstaion Agent ---")
+    // console.log("--- Calling Converstaion Agent ---")
     const callConversationAgent = await conversationAgent(conversation, "", artefactsObject);
     const conversationResponse = await aiWrapper(callConversationAgent);
 
@@ -146,13 +146,13 @@ async function artefactBuilder(conversation, userid, scope) { // Updated param n
 
     // CALL THE function getArtefactFrame and capture the response as a variable artefactFrame
     // Send the scope object received.
-    const artefactFrame = await getArtefactFrame(scope);       // Get the template structure
-    const artefactInitial = await getArtefactInitial(scope); // Get the initial data state
+    const artefactFrame = conversation.artefactFrame ?? await getArtefactFrame(scope);       // Get the template structure
+    const artefactInitial = conversation.artefactInitial ?? await getArtefactInitial(scope); // Get the initial data state
 
     // Determine artefact data: use initial state if no previous artefact exists
-    const artefactData = (conversation.artefacts && conversation.artefacts[0] == null)
-        ? artefactInitial
-        : conversation.artefacts;
+    const artefactData = (conversation.artefacts && conversation.artefacts.length > 0)
+        ? conversation.artefacts
+        : artefactInitial;
 
     let artefactsObject = {
         artefactFrame: artefactFrame,

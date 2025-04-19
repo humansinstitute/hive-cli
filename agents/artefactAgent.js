@@ -15,8 +15,6 @@ async function artefactAgent(message, context, history, artefactsObject) { //FIL
     // artefactsObject.artefactInitial -> The start point prior to the conversation
     // artefactsObject.artefact -> The latest version of the artefact.
 
-    console.log(`We are inside the artefactAgent\n\nTHE FRAME IS:\n\n${JSON.stringify(artefactsObject.artefactFrame)}\n\nTHE CURRENT IS:\n\n${JSON.stringify(artefactsObject.artefact)}\n\nTHE MESSAGE HISTORY IS:\n\n${message}\n${historyString}`);
-
     const systemPromptInput = `Please review this conversation history and output a JSON object with the following fields:
 
     JSON OBJECT
