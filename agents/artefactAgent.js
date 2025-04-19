@@ -3,50 +3,37 @@
 // Other parameters the will be set at run time. Response details will be logged in mongo
 // and referenced by the callID set in the guid below. 
 
-async function artefactAgent(message, context, history, facts) { //FILL IN VARIABLES
+async function artefactAgent(message, context, history, artefactsObject) { //FILL IN VARIABLES
     const { v4: uuidv4 } = require('uuid');
     // Convert history array to a formatted string
     const historyString = history.map(entry =>
         `${entry.role.toUpperCase()}: ${entry.content}`
     ).join('\n\n');
 
-    const systemPromptInput = `Please review this message history and output a JSON object with the following fields:
+    // artefactsObject inclludes three key varioables for fact extraction
+    // artefactsObject.artefactFrame -> The template of the artefact type we're trying to gather details on
+    // artefactsObject.artefactInitial -> The start point prior to the conversation
+    // artefactsObject.artefact -> The latest version of the artefact.
 
-JSON OBJECT
-{
-    "facts": {
-        "basic_info": {
-            "name": "Full name of the user",
-            "company": "Company or organization name",
-            "industry": "Industry or sector they operate in",
-            "email": "Email address of the user"
-        },
-        "website_info": {
-            "purpose": "Primary purpose of the website (informational, e-commerce, portfolio, etc.)",
-            "goals": ["List of business goals for the website"],
-            "target_audience": "Description of target audience demographics and behaviors",
-            "site_type": "ecommerce | portfolio | brochure | other",
-            "pageList": ["List of main pages", "for the website"]
-        }
-    },
-    "render": {
-        "type": "text",
-        "content": "Please generate a markdown version of the current set of the facts in the - fact object - with apropriate headings and information. the title should be - Website Brief: Client Name"
-    }
-}
+    console.log(`We are inside the artefactAgent\n\nTHE FRAME IS:\n\n${JSON.stringify(artefactsObject.artefactFrame)}\n\nTHE CURRENT IS:\n\n${JSON.stringify(artefactsObject.artefact)}\n\nTHE MESSAGE HISTORY IS:\n\n${message}\n${historyString}`);
 
-*******
-The current facts you know right now are:
-${facts}
-*******
+    const systemPromptInput = `Please review this conversation history and output a JSON object with the following fields:
 
-Please review the conversation and update with additional facts. Do not remove interesting facts from earlier in the conversation but build upon them. Goals and other elements can be refined over time.
+    JSON OBJECT
+    ${JSON.stringify(artefactsObject.artefactFrame)}
 
-HERE IS THE MESSAGE HISTORY OF THIS CONVERSATION:
-Last Message: ${message} 
-Message History: ${historyString}
-    
-ONLY REPLY WITH THE JSON OBJECT AND WITH NO OTHER CHARACTERS OR TEXT.`;
+    *******
+    The current facts you know right now are:
+    ${JSON.stringify(artefactsObject.artefact)}
+    *******
+
+    Please review the conversation and update with additional facts. Do not remove interesting facts from earlier in the conversation but build upon them. Goals and other elements can be refined over time.
+
+    HERE IS THE MESSAGE HISTORY OF THIS CONVERSATION:
+    Last Message: ${message} 
+    Message History: ${historyString}
+        
+    ONLY REPLY WITH THE JSON OBJECT AND WITH NO OTHER CHARACTERS OR TEXT.`;
 
     const callDetails = {
         callID: uuidv4(),

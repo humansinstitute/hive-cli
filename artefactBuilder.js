@@ -12,7 +12,7 @@
  */
 
 // IMPORT REQUIRED AGENTS WE WILL USE FOR THIS TASK
-const nextQuestionAgent = require('./agents/nextQuestionAgent');
+const conversationAgent = require('./agents/conversationAgent');
 const artefactAgent = require('./agents/artefactAgent');
 const statusBot = require('./agents/statusBot'); // Import statusBot
 const fs = require('fs'); // Added for file system access
@@ -114,25 +114,62 @@ async function getArtefactInitial(scope) {
 // 1) Extract updates to docuemntation objects based on user input
 // 2) Figure out the next best question to fill out the requirements form the user
 // 3) Reflect and check for completeness of the docuemnation 
-async function agentLogic(conversation, userId, artefactFrame) {
+async function agentLogic(conversation, artefactsObject) {
+    console.log("--- Starting Agent Logic Flow ---")
 
+    console.log("--- Calling Artefact Agent ---")
+    const callArtefactAgent = await artefactAgent(conversation.message, "", conversation.history, artefactsObject);
+    const updatedArtefactsObject = await aiWrapper(callArtefactAgent);
+
+    // Updates the artefactsObject based on the response from artefact agent. 
+    artefactsObject.artefact = updatedArtefactsObject.message;
+
+    console.log("--- Calling Converstaion Agent ---")
+    const callConversationAgent = await conversationAgent(conversation, "", artefactsObject);
+    const conversationResponse = await aiWrapper(callConversationAgent);
+
+    // Create a  response object with updated artefacts and conversation response.
+    const agentUpdatesResponse = {
+        artefactUpdated: updatedArtefactsObject.message,
+        nextQuestion: conversationResponse.message
+    };
+    return agentUpdatesResponse;
 }
 
 
 async function artefactBuilder(conversation, userid, scope) { // Updated param name
-    console.log("--- artefactBuilder Called ---");
-    console.log("Received Conversation Object:", conversation);
-    // console.log("Received Question (message):", conversation.message); // Log specific parts if needed
-    // console.log("Received History:", conversation.history);
-    // console.log("Received Previous Artefacts:", conversation.artefacts);
-    console.log("Received UserID:", userid);
-    console.log("Received Scope:", scope);
+    // console.log("--- artefactBuilder Called ---");
+    // console.log("Received Conversation Object:", conversation);
 
     // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // CALL THE function getArtefactFrame and capture the response as a variable artefactFrame
+    // Send the scope object received.
+    const artefactFrame = await getArtefactFrame(scope);       // Get the template structure
+    const artefactInitial = await getArtefactInitial(scope); // Get the initial data state
+
+    // Determine artefact data: use initial state if no previous artefact exists
+    const artefactData = (conversation.artefacts && conversation.artefacts[0] == null)
+        ? artefactInitial
+        : conversation.artefacts;
+
+    let artefactsObject = {
+        artefactFrame: artefactFrame,
+        artefactInitial: artefactInitial,
+        artefact: artefactData
+    };
+
+    // Calls the agent logic to update artefacts and generate response
+    const agentUpdates = await agentLogic(conversation, artefactsObject);
+
+    // const agentUpdates = {
+    //     artefactUpdated: {},
+    //     nextQuestion: "the next question"
+    // };
 
     // Generate the response message for this turn
-    const responseMessage = `${conversation.message} - Of course this is great keep going`;
+    const responseMessage = `${agentUpdates.nextQuestion}`;
 
     // Construct the full history including the current exchange
     const responseHistory = [
@@ -141,17 +178,12 @@ async function artefactBuilder(conversation, userid, scope) { // Updated param n
         { role: 'assistant', content: responseMessage }
     ];
 
-    // CALL THE function getArtefactFrame and capture the response as a variable artefactFrame
-    // Send the scope object received.
-    const artefactFrame = await getArtefactFrame(scope);       // Get the template structure
-    const artefactInitial = await getArtefactInitial(scope); // Get the initial data state
-
     // Construct the mocked response object
     const response = {
         message: responseMessage,
         history: responseHistory, // Include the updated history
         artefacts: [
-            { id: 1, name: "artefact 1", data: "stringified data object" } // Mocked artefact - TODO: Replace with actual artefact logic
+            agentUpdates.artefactUpdated
         ],
         artefactFrame: artefactFrame,     // Include the template frame
         artefactInitial: artefactInitial, // Include the initial state

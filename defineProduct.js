@@ -17,7 +17,9 @@ async function defineProduct(scope) {
     });
 
     let question = process.env.WELCOME_MESSAGE; // Initial question
-    let history = []; // Initialize conversation history
+    let history = [
+        { role: 'assistant', content: question }
+    ]; // Initialize conversation history with initial question
     let lastArtefacts = null; // Initialize artefacts from last response
     let lastArtefactFrame = null; // Initialize artefact frame from last response
     let lastArtefactInitial = null; // Initialize initial artefact state from last response
@@ -35,8 +37,6 @@ async function defineProduct(scope) {
                     await new Promise(res => setTimeout(res, 2000)); // Wait 2 seconds
                     rl.close();
                     console.log("--- Product Level Definition Complete ---");
-                    console.log("--- Product Level Definition Complete ---");
-                    // Optionally log history on exit if needed: console.log("Final History:", history);
                     resolve(); // Resolve the promise to signal completion
                 } else {
                     // Construct the conversation object for the builder
