@@ -19,6 +19,8 @@ async function defineProduct(scope) {
     let question = process.env.WELCOME_MESSAGE; // Initial question
     let history = []; // Initialize conversation history
     let lastArtefacts = null; // Initialize artefacts from last response
+    let lastArtefactFrame = null; // Initialize artefact frame from last response
+    let lastArtefactInitial = null; // Initialize initial artefact state from last response
 
     // Use a promise to handle the async nature of readline
     return new Promise(async (resolve) => {
@@ -41,7 +43,9 @@ async function defineProduct(scope) {
                     const conversation = {
                         message: userInput,
                         history: history,
-                        artefacts: lastArtefacts
+                        artefacts: lastArtefacts,
+                        artefactFrame: lastArtefactFrame, // Pass the last frame
+                        artefactInitial: lastArtefactInitial // Pass the last initial state
                     };
 
                     // Call artefactBuilder with the conversation object
@@ -54,6 +58,8 @@ async function defineProduct(scope) {
                         // Update state for the next turn
                         history = builderResponse.history; // Update history from the response
                         lastArtefacts = builderResponse.artefacts; // Update artefacts from the response
+                        lastArtefactFrame = builderResponse.artefactFrame; // Store the new frame
+                        lastArtefactInitial = builderResponse.artefactInitial; // Store the new initial state
                         question = builderResponse.message; // Update the question for the next prompt
 
                         // Ask the next question

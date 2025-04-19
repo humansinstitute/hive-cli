@@ -1,4 +1,13 @@
 {
+    "pbrief": {
+        "product_name": "hive-cli",
+        "product_brief": "A simple CLI tool that can be used to help build out specifications for products and features that are easily accessible as context for LLM coding tools.",
+        "pillars": "cli based chat with agents that build hte requirement JSON files"
+    },
+    "architecture": {
+        "front_end": "cli menu",
+        "backend": "Can call to APIs on everest chat using a set of predefined agents in the ./agents folder.\n"
+    },
     "features": {
         "features_list": [
             {

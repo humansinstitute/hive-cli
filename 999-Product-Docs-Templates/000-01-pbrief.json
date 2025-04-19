@@ -1,5 +1,7 @@
 {
-    "product_name": "",
-    "product_brief": "",
-    "pillars": ""
+    "pbrief": {
+        "product_name": "",
+        "product_brief": "",
+        "pillars": ""
+    }
 }
