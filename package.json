@@ -1,0 +1,19 @@
+{
+  "name": "hive-cli",
+  "version": "0.0.1",
+  "description": "A CLI tool to develop common requirements to make building with LLMs simpler. ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hive",
+    "cli",
+    "ai"
+  ],
+  "author": "PW21",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^12.5.2"
+  }
+}

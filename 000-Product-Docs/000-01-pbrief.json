@@ -1,0 +1,5 @@
+{
+    "product_name": "hive-cli",
+    "product_brief": "A simple CLI tool that can be used to help build out specifications for products and features that are easily accessible as context for LLM coding tools.",
+    "pillars": "cli based chat with agents that build hte requirement JSON files"
+}

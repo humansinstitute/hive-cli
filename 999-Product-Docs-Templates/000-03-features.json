@@ -1,0 +1,18 @@
+{
+    "features_list": [
+        {
+            "feature_ref": "001",
+            "feature_name": "",
+            "feature_status": "backlog | wip | delivered | archived",
+            "feature_focus": "",
+            "feature_brief": ""
+        },
+        {
+            "feature_ref": "002",
+            "feature_name": "",
+            "feature_status": "backlog | wip | delivered | archived",
+            "feature_focus": "",
+            "feature_brief": ""
+        }
+    ]
+}

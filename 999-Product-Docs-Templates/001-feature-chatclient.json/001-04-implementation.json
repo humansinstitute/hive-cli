@@ -1,0 +1,20 @@
+{
+    "implementation": [
+        {
+            "implementation_step": 1,
+            "goal": "",
+            "design": "",
+            "test": "",
+            "acceptance_Criteria": "",
+            "status": "backlog | wip | delivered | archived"
+        },
+        {
+            "implementation_step": 2,
+            "goal": "",
+            "design": "",
+            "test": "",
+            "acceptance_Criteria": "",
+            "status": "backlog | wip | delivered | archived"
+        }
+    ]
+}

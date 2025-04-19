@@ -1,0 +1,75 @@
+const readline = require('readline');
+const { artefactBuilder } = require('./artefactBuilder'); // Import the builder
+
+/**
+ * Handles the definition or update process for product-level documentation
+ * via an interactive chat interface.
+ * @param {object} scope - The current scope object.
+ * @returns {Promise<void>} Resolves when the user exits the chat.
+ */
+async function defineProduct(scope) {
+    console.log("--- Defining Product Level ---");
+    console.log("Received Scope:", scope);
+
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    let question = process.env.WELCOME_MESSAGE; // Initial question
+    let history = []; // Initialize conversation history
+    let lastArtefacts = null; // Initialize artefacts from last response
+
+    // Use a promise to handle the async nature of readline
+    return new Promise(async (resolve) => {
+        const askQuestion = async () => {
+            // Use the current question for the prompt
+            rl.question(`${question} `, async (answer) => { // Added space for better formatting
+                const userInput = answer.trim();
+
+                if (userInput.toLowerCase() === 'exit') {
+                    console.log("Exiting product definition.");
+                    console.log("Final Scope:", scope);
+                    await new Promise(res => setTimeout(res, 2000)); // Wait 2 seconds
+                    rl.close();
+                    console.log("--- Product Level Definition Complete ---");
+                    console.log("--- Product Level Definition Complete ---");
+                    // Optionally log history on exit if needed: console.log("Final History:", history);
+                    resolve(); // Resolve the promise to signal completion
+                } else {
+                    // Construct the conversation object for the builder
+                    const conversation = {
+                        message: userInput,
+                        history: history,
+                        artefacts: lastArtefacts
+                    };
+
+                    // Call artefactBuilder with the conversation object
+                    try {
+                        const builderResponse = await artefactBuilder(conversation, 'pw21', scope);
+
+                        // Log the response object for debugging (optional)
+                        console.log('Artefact Builder Response:', builderResponse);
+
+                        // Update state for the next turn
+                        history = builderResponse.history; // Update history from the response
+                        lastArtefacts = builderResponse.artefacts; // Update artefacts from the response
+                        question = builderResponse.message; // Update the question for the next prompt
+
+                        // Ask the next question
+                        askQuestion();
+                    } catch (error) {
+                        console.error("Error calling artefactBuilder:", error);
+                        // Decide how to handle errors, maybe ask again or exit
+                        askQuestion(); // Ask again even if there's an error for now
+                    }
+                }
+            });
+        };
+
+        // Start the conversation
+        askQuestion();
+    });
+}
+
+module.exports = { defineProduct };
