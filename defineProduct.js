@@ -1,7 +1,14 @@
 const readline = require('readline');
-const { artefactBuilder } = require('./artefactBuilder'); // Import the builder
+const { artefactBuilder, getArtefactInitial, getArtefactFrame } = require('./artefactBuilder'); // Import the builder and initial loaders
 const fs = require('fs');
 const path = require('path');
+
+function logArtefact({ pbrief, architecture, features }) {
+    console.log("\n--- Our Updated Artefact ---\n");
+    console.log(pbrief);
+    console.log(architecture);
+    console.log(features);
+}
 
 /**
  * Handles the definition or update process for product-level documentation
@@ -11,26 +18,41 @@ const path = require('path');
  */
 async function defineProduct(scope) {
     console.log("--- Defining Product Level ---");
-    console.log("Received Scope:", scope);
+    // console.log("Received Scope:", scope);
 
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
     });
 
-    let question = process.env.WELCOME_MESSAGE; // Initial question
+    // Load initial artefacts and frame
+    const { data: initialData, filePaths } = await getArtefactInitial(scope);
+    const frame = await getArtefactFrame(scope);
+
+    let lastArtefactInitial = { data: initialData, filePaths };
+    let lastArtefacts = [initialData];
+    let lastArtefactFrame = frame;
+
+    // Determine initial question
+    let question;
+    if (initialData.pbrief?.product_name && initialData.pbrief?.product_brief) {
+        console.log("\n--- Your Current Artefact ---\n");
+        logArtefact(initialData);
+        question = "What updates would you like to make?";
+    } else {
+        question = process.env.WELCOME_MESSAGE;
+    }
+
     let history = [
         { role: 'assistant', content: question }
-    ]; // Initialize conversation history with initial question
-    let lastArtefacts = null; // Initialize artefacts from last response
-    let lastArtefactFrame = null; // Initialize artefact frame from last response
-    let lastArtefactInitial = null; // Initialize initial artefact state from last response
+    ];
 
     // Use a promise to handle the async nature of readline
     return new Promise(async (resolve) => {
         const askQuestion = async () => {
             // Use the current question for the prompt
-            rl.question(`${question} `, async (answer) => { // Added space for better formatting
+            console.log("\n--- Agent Questions ---\n");
+            rl.question(`${question} \n\n`, async (answer) => { // Added space for better formatting
                 const userInput = answer.trim();
 
                 if (userInput.toLowerCase() === 'exit') {
@@ -67,7 +89,7 @@ async function defineProduct(scope) {
                         const builderResponse = await artefactBuilder(conversation, 'pw21', scope);
 
                         // Log the response object for debugging (optional)
-                        // console.log('Artefact Builder Response:', builderResponse);
+                        console.log('Artefact Builder Response:', builderResponse);
                         // Log the current product artefact in total for easy reading on screen. 
                         console.log(builderResponse.artefacts[0].pbrief);
                         console.log(builderResponse.artefacts[0].architecture);

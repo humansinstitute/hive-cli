@@ -19,6 +19,25 @@ const fs = require('fs'); // Added for file system access
 const path = require('path'); // Added for path manipulation
 const aiWrapper = require('./common/aimodels/aiWrapper'); // Used to Call different agents
 
+/**
+ * Normalize artefact input into an array of objects.
+ * If input is a string, strip ```json fences and parse it.
+ * If input is already an object or array, return it unchanged.
+ */
+function normalizeArtefacts(raw) {
+    if (typeof raw === 'string') {
+        let cleaned = raw.replace(/```(?:json)?/g, '').trim();
+        try {
+            const parsed = JSON.parse(cleaned);
+            return Array.isArray(parsed) ? parsed : [parsed];
+        } catch (e) {
+            console.error('Failed to parse artefacts JSON:', e);
+            return [];
+        }
+    }
+    return Array.isArray(raw) ? raw : [raw];
+}
+
 
 // --- Internal Helper Function ---
 
@@ -106,7 +125,6 @@ async function _getJsonArtefactPaths(dirPath) {
  * @returns {Promise<object>} The artefact frame object.
  */
 async function getArtefactFrame(scope) {
-    console.log("--- getArtefactFrame Called ---");
     if (scope?.scopelevel !== 'product') {
         console.log("Scope is not 'product', returning empty frame.");
         return {};
@@ -122,7 +140,7 @@ async function getArtefactFrame(scope) {
  * @returns {Promise<object>} The initial artefact state object.
  */
 async function getArtefactInitial(scope) {
-    console.log("--- getArtefactInitial Called ---");
+    // console.log("--- getArtefactInitial Called ---");
     if (scope?.scopelevel !== 'product') {
         console.log("Scope is not 'product', returning empty initial state.");
         return { data: {}, filePaths: {} };
@@ -139,7 +157,7 @@ async function getArtefactInitial(scope) {
 // 2) Figure out the next best question to fill out the requirements form the user
 // 3) Reflect and check for completeness of the docuemnation 
 async function agentLogic(conversation, artefactsObject) {
-    console.log("--- Starting Agent Logic Flow ---")
+    // console.log("--- Starting Agent Logic Flow ---")
 
     // console.log("--- Calling Artefact Agent ---")
     const callArtefactAgent = await artefactAgent(conversation.message, "", conversation.history, artefactsObject);
@@ -162,17 +180,14 @@ async function agentLogic(conversation, artefactsObject) {
 
 
 async function artefactBuilder(conversation, userid, scope) { // Updated param name
-    // console.log("--- artefactBuilder Called ---");
-    // console.log("Received Conversation Object:", conversation);
 
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // CALL THE function getArtefactFrame and capture the response as a variable artefactFrame
     // Send the scope object received.
-    const artefactFrame = conversation.artefactFrame ?? await getArtefactFrame(scope);       // Get the template structure
-    const { data: artefactInitialData, filePaths: artefactFilePaths } =
-        conversation.artefactInitial ?? await getArtefactInitial(scope); // Get the initial data and paths
+    const artefactFrame = conversation.artefactFrame;       // Use passed-in template structure
+    const { data: artefactInitialData, filePaths: artefactFilePaths } = conversation.artefactInitial; // Use passed-in initial data and paths
 
     // Determine artefact data: use initial state if no previous artefact exists
     const artefactData = (conversation.artefacts && conversation.artefacts.length > 0)
@@ -204,12 +219,11 @@ async function artefactBuilder(conversation, userid, scope) { // Updated param n
     ];
 
     // Construct the mocked response object
+    const artefacts = normalizeArtefacts(agentUpdates.artefactUpdated);
     const response = {
         message: responseMessage,
         history: responseHistory, // Include the updated history
-        artefacts: [
-            agentUpdates.artefactUpdated
-        ],
+        artefacts: artefacts,
         artefactFrame: artefactFrame,     // Include the template frame
         artefactInitial: artefactInitialData, // Include the initial state
         artefactPaths: artefactFilePaths,     // Include file path mapping
@@ -227,4 +241,4 @@ async function artefactBuilder(conversation, userid, scope) { // Updated param n
     return response; // Return the structured object
 }
 
-module.exports = { artefactBuilder };
+module.exports = { artefactBuilder, getArtefactInitial, getArtefactFrame };

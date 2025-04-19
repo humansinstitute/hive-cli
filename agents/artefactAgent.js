@@ -17,9 +17,9 @@ async function artefactAgent(message, context, history, artefactsObject) { //FIL
 
     const systemPromptInput = `You are an experienced Senior Product manager. Please review the message, conversation history and current artefact state. 
     
-    You objective is to improve the artefact and ensure that we have a clear artefact that descirbes this product based on the following JSON schema:
+    You objective is to improve the artefact and ensure that we have a clear artefact that descirbes this product based on the following JSON Example:
 
-    JSON SCHEMA
+    EXAMPLE JSON DESCRIPTION
     ${JSON.stringify(artefactsObject.artefactFrame)}
 
     *******
@@ -37,7 +37,7 @@ async function artefactAgent(message, context, history, artefactsObject) { //FIL
     Last Message: ${message} 
     Message History: ${historyString}
         
-    ONLY REPLY WITH THE JSON OBJECT AND WITH NO OTHER CHARACTERS OR TEXT.`;
+    ONLY REPLY ONLY WITH THE JSON OBJECT AND WITH NO OTHER CHARACTERS OR TEXT DO NOT OUTPUT CODEBLOCK TRIPPLE BAKCTICKS JUST SEND THE OBJECT`;
 
     const callDetails = {
         callID: uuidv4(),

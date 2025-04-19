@@ -1,42 +1,7 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "title": "Product Brief Schema",
-    "description": "A schema for defining product briefs with core components",
-    "required": [
-        "pbrief"
-    ],
-    "properties": {
-        "pbrief": {
-            "type": "object",
-            "required": [
-                "product_name",
-                "product_brief",
-                "pillars"
-            ],
-            "properties": {
-                "product_name": {
-                    "type": "string",
-                    "description": "Short, memorable name of the product"
-                },
-                "product_brief": {
-                    "type": "string",
-                    "description": "Concise description of the product's purpose and core value proposition"
-                },
-                "pillars": {
-                    "type": "string",
-                    "description": "Comma-separated list of the core functional components that make up the product's architecture. Each pillar should be a distinct part of the system with a specific responsibility in the overall product ecosystem."
-                }
-            }
-        }
-    },
-    "examples": [
-        {
-            "pbrief": {
-                "product_name": "hive-cli",
-                "product_brief": "A command-line tool for building standardized product specifications that can be used as context for LLM coding tools.",
-                "pillars": "CLI interface, specification generator, LLM context formatter, template library"
-            }
-        }
-    ]
+    "pbrief": {
+        "product_name": "Short, memorable name of the product",
+        "product_brief": "Concise description of the product's purpose and core value proposition.",
+        "pillars": "Comma-separated list of the core functional components that make up the product's architecture. Each pillar should be a distinct part of the system with a specific responsibility in the overall product ecosystem."
+    }
 }
