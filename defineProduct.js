@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 function logArtefact({ pbrief, architecture, features }) {
-    console.log("\n--- Our Updated Artefact ---\n");
+    console.log("\n--- The Current Artefact ---\n");
     console.log(pbrief);
     console.log(architecture);
     console.log(features);
@@ -17,8 +17,6 @@ function logArtefact({ pbrief, architecture, features }) {
  * @returns {Promise<void>} Resolves when the user exits the chat.
  */
 async function defineProduct(scope) {
-    console.log("--- Defining Product Level ---");
-    // console.log("Received Scope:", scope);
 
     const rl = readline.createInterface({
         input: process.stdin,
@@ -28,7 +26,7 @@ async function defineProduct(scope) {
     // Load initial artefacts and frame
     const { data: initialData, filePaths } = await getArtefactInitial(scope);
     const frame = await getArtefactFrame(scope);
-
+    x
     let lastArtefactInitial = { data: initialData, filePaths };
     let lastArtefacts = [initialData];
     let lastArtefactFrame = frame;
@@ -36,7 +34,7 @@ async function defineProduct(scope) {
     // Determine initial question
     let question;
     if (initialData.pbrief?.product_name && initialData.pbrief?.product_brief) {
-        console.log("\n--- Your Current Artefact ---\n");
+        // console.log("\n--- Your Current Artefact ---\n");
         logArtefact(initialData);
         question = "What updates would you like to make?";
     } else {

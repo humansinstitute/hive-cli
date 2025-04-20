@@ -2,34 +2,73 @@
  * Handles the definition or update process for feature-level documentation.
  */
 
-const inquirer = require('inquirer');
-const fs = require('fs').promises; // Use promises API for async file reading
-const path = require('path'); // To construct the file path reliably
+const inquirer = require('inquirer').default;
+const fs = require('fs').promises;
+const path = require('path');
 
-const featuresFilePath = path.join(__dirname, '000-Product-Docs', '000-03-features.json'); // Keep path for potential future use
+async function defineFeature(scope) {
+    console.log('--- Defining Feature Level ---');
+    console.log('Received Scope:', scope);
 
-async function defineFeature(scope) { // Accept scope as argument
-    console.log("--- Defining Feature Level ---");
+    const featureId = scope.feature;
+    const productDocsRoot = path.join(__dirname, '000-Product-Docs');
+    const templateDir = path.join(__dirname, '999-Product-Docs-Templates', '001-feature-example.json');
 
+    // Determine or create target feature folder
+    let targetFolderName;
     try {
-        // Scope is now passed in, no need to determine it here.
-        console.log("Received Scope:", scope);
-
-        // TODO: Add logic here to guide the user through updating/creating feature documents
-        // based on the received scope (scope.feature will be '001', '002', 'new', etc.)
-        console.log(`Processing feature: ${scope.feature === 'new' ? 'New Feature Definition' : `Update Feature ${scope.feature}`}`);
-
-        // Simulate work and wait for 2 seconds as requested
-        console.log("Simulating feature definition work...");
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-
-    } catch (error) {
-        console.error("An error occurred during feature definition:", error);
-        // Handle error appropriately
-    } finally {
-        console.log("--- Feature Level Definition Complete ---");
-        // Control will return to index.js automatically after this function finishes
+        const entries = await fs.readdir(productDocsRoot, { withFileTypes: true });
+        const match = entries.find(entry => {
+            return entry.isDirectory() && entry.name.startsWith(featureId + '-feature-');
+        });
+        if (match) {
+            targetFolderName = match.name;
+            console.log('Found existing feature folder: ' + targetFolderName);
+        } else {
+            // Prompt for slug
+            const answers = await inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'slug',
+                    message: 'No folder for feature "' + featureId + '" found. Enter a slug for this feature:'
+                }
+            ]);
+            const slug = answers.slug;
+            targetFolderName = featureId + '-feature-' + slug + '.json';
+            const newDir = path.join(productDocsRoot, targetFolderName);
+            await fs.mkdir(newDir, { recursive: true });
+            console.log('Created new feature folder: ' + targetFolderName);
+        }
+    } catch (err) {
+        console.error('Error finding or creating feature folder:', err);
+        return;
     }
+
+    // Synchronize template files into target folder
+    const targetDir = path.join(productDocsRoot, targetFolderName);
+    try {
+        const templateFiles = await fs.readdir(templateDir);
+        for (const file of templateFiles) {
+            // Rename prefix from '001-' to '<featureId>-'
+            const destFileName = file.replace(/^001-/, featureId + '-');
+            const srcPath = path.join(templateDir, file);
+            const destPath = path.join(targetDir, destFileName);
+
+            try {
+                await fs.access(destPath);
+                // file exists
+            } catch {
+                // missing: copy it
+                await fs.copyFile(srcPath, destPath);
+                console.log('Copied template file to: ' + destFileName);
+            }
+        }
+    } catch (err) {
+        console.error('Error synchronizing template files:', err);
+        return;
+    }
+
+    console.log('--- Feature Level Definition Complete ---');
 }
 
 module.exports = { defineFeature };

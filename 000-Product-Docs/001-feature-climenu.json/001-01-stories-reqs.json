@@ -1,4 +1,12 @@
 {
+    "stories": [
+        {
+            "feature_ref": "",
+            "story_ref": "",
+            "story": "",
+            "status": "backlog | wip | delivered | archived"
+        }
+    ],
     "requirements": [
         {
             "feature_ref": "",

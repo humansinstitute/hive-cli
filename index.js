@@ -60,8 +60,8 @@ async function hivecli() { // Removed message and userId parameters as they are 
                     try {
                         const fileContent = await fs.readFile(featuresFilePath, 'utf8');
                         featuresData = JSON.parse(fileContent);
-                        if (featuresData && featuresData.features_list && Array.isArray(featuresData.features_list)) {
-                            existingFeatures = featuresData.features_list;
+                        if (featuresData && featuresData.features && Array.isArray(featuresData.features.features_list)) {
+                            existingFeatures = featuresData.features.features_list;
                         }
                     } catch (readError) {
                         if (readError.code !== 'ENOENT') {
@@ -73,20 +73,23 @@ async function hivecli() { // Removed message and userId parameters as they are 
                         // If ENOENT, proceed with empty existingFeatures, allowing 'Define new'
                     }
 
+                    if (existingFeatures.length === 0) {
+                        console.log("No features found. Please define new features in the product backlog.");
+                        await hivecli();
+                        return;
+                    }
                     const featureChoices = existingFeatures.map(feature => ({
                         name: `${feature.feature_ref}: ${feature.feature_name} (${feature.feature_status || 'N/A'})`,
                         value: feature.feature_ref
                     }));
 
                     // Add "Define new" option
-                    featureChoices.push(new Separator()); // Use Separator from dynamic import
-                    featureChoices.push({ name: 'Define a new feature', value: 'new' });
 
                     const featureAnswer = await inquirer.default.prompt([ // Use inquirer.default.prompt
                         {
                             type: 'list',
                             name: 'selectedFeature',
-                            message: 'Select a feature to update or define a new one:',
+                            message: 'Select a feature to update:',
                             choices: featureChoices,
                         }
                     ]);
